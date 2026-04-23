@@ -42,7 +42,7 @@ function handleCredentialResponse(response) {
   formData.append("foto", data.picture);
 
   fetch("/", {
-    method: "POST",
+    method: "GET",
     body: formData
   })
   .then(() => {
