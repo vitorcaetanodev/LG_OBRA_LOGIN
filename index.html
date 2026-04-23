@@ -19,14 +19,36 @@
 <body>
 
 <div id="buttonDiv"></div>
-
+<form name="leads" method="POST" data-netlify="true" hidden>
+  <input type="text" name="nome">
+  <input type="email" name="email">
+  <input type="text" name="foto">
+</form>
 <script>
-function handleCredentialResponse(response) {
-  console.log(response.credential);
 
-  window.location.href = "https://obracorretora.com.br";
+function parseJwt(token) {
+  const base64Url = token.split('.')[1];
+  const base64 = atob(base64Url);
+  return JSON.parse(base64);
 }
 
+function handleCredentialResponse(response) {
+  const data = parseJwt(response.credential);
+
+  const formData = new FormData();
+  formData.append("form-name", "leads");
+  formData.append("nome", data.name);
+  formData.append("email", data.email);
+  formData.append("foto", data.picture);
+
+  fetch("/", {
+    method: "POST",
+    body: formData
+  })
+  .then(() => {
+    window.location.href = "https://obracorretora.com.br";
+  });
+}
 window.onload = function () {
   google.accounts.id.initialize({
     client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
