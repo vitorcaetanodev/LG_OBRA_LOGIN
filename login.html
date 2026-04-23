@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Login Google</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    body {
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+      font-family:Arial;
+      background:#f5f5f5;
+    }
+  </style>
+</head>
+<body>
+
+<div id="buttonDiv"></div>
+
+<script>
+function handleCredentialResponse(response) {
+  console.log(response.credential);
+
+  window.location.href = "https://obracorretora.com.br";
+}
+
+window.onload = function () {
+  google.accounts.id.initialize({
+    client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
+    callback: handleCredentialResponse
+  });
+
+  google.accounts.id.renderButton(
+    document.getElementById("buttonDiv"),
+    { theme: "outline", size: "large" }
+  );
+};
+</script>
+
+</body>
+</html>
