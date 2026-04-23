@@ -19,7 +19,8 @@
 <body>
 
 <div id="buttonDiv"></div>
-<form name="leads" method="POST" data-netlify="true" hidden>
+<form name="leads" method="POST" data-netlify="true">
+  <input type="hidden" name="form-name" value="leads">
   <input type="text" name="nome">
   <input type="email" name="email">
   <input type="text" name="foto">
@@ -42,7 +43,7 @@ function handleCredentialResponse(response) {
   formData.append("foto", data.picture);
 
   fetch("/", {
-    method: "GET",
+    method: "POST",
     body: formData
   })
   .then(() => {
