@@ -44,44 +44,28 @@ function parseJwt(token) {
 }
 
 // 🔹 Função chamada após login Google
-async function handleCredentialResponse(response) {
-  console.log("Login recebido");
-
+function handleCredentialResponse(response) {
   const data = parseJwt(response.credential);
 
-  if (!data) {
-    alert("Erro ao processar login");
-    return;
-  }
-  alert(data.name);
-  console.log("Dados:", data);
+  if (!data) return;
 
-  // 🔹 Monta form para Netlify
+  const nome = encodeURIComponent(data.name || "");
+  const email = encodeURIComponent(data.email || "");
+  const foto = encodeURIComponent(data.picture || "");
+
+  // 🔥 dispara envio SEM travar
   const formData = new FormData();
   formData.append("form-name", "leads");
   formData.append("nome", data.name);
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
-  try {
-    // 🔥 Espera o POST finalizar
-    await fetch("/", {
-      method: "POST",
-      body: formData
-    });
+  fetch("/", {
+    method: "POST",
+    body: formData
+  }).catch(() => {});
 
-    console.log("Lead enviado com sucesso");
-
-  } catch (error) {
-    console.error("Erro ao enviar lead:", error);
-  }
-
-  // 🔹 Prepara dados para URL
-  const nome = encodeURIComponent(data.name || "");
-  const email = encodeURIComponent(data.email || "");
-  const foto = encodeURIComponent(data.picture || "");
-
-  // 🔥 Redireciona depois de tudo pronto
+  // 🔥 REDIRECIONA IMEDIATAMENTE (isso resolve seu problema)
   window.location.href = `https://obracorretora.com.br?nome=${nome}&email=${email}&foto=${foto}`;
 }
 
