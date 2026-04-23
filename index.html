@@ -19,14 +19,15 @@
 <body>
 
 <div id="buttonDiv"></div>
-<form hidden name="leads" method="POST" netlify>
+
+<form hidden name="leads" method="POST" data-netlify="true">
   <input type="hidden" name="form-name" value="leads">
   <input type="text" name="nome">
   <input type="email" name="email">
   <input type="text" name="foto">
 </form>
-<script>
 
+<script>
 function parseJwt(token) {
   const base64Url = token.split('.')[1];
   const base64 = atob(base64Url);
@@ -36,26 +37,39 @@ function parseJwt(token) {
 function handleCredentialResponse(response) {
   const data = parseJwt(response.credential);
 
+  // Envia para Netlify Forms
   const formData = new FormData();
   formData.append("form-name", "leads");
   formData.append("nome", data.name);
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
+  fetch("/", {
+    method: "POST",
+    body: formData
+  });
+
+  // Redireciona com dados
   const nome = encodeURIComponent(data.name);
   const email = encodeURIComponent(data.email);
   const foto = encodeURIComponent(data.picture);
 
   window.location.href = `https://obracorretora.com.br?nome=${nome}&email=${email}&foto=${foto}`;
-  window.onload = function () {
-    google.accounts.id.initialize({
-      client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
-      callback: handleCredentialResponse
-    });
+}
+
+// ⚠️ window.onload FORA da função (esse era o erro principal)
+window.onload = function () {
+  google.accounts.id.initialize({
+    client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
+    callback: handleCredentialResponse
+  });
 
   google.accounts.id.renderButton(
     document.getElementById("buttonDiv"),
-    { theme: "outline", size: "large" }
+    {
+      theme: "outline",
+      size: "large"
+    }
   );
 };
 </script>
