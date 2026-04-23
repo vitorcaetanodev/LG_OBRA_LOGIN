@@ -3,24 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>Login Google</title>
+
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 
   <style>
     body {
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-      font-family:Arial;
-      background:#f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: Arial;
+      background: #f5f5f5;
     }
   </style>
 </head>
+
 <body>
 
 <div id="buttonDiv"></div>
 
-<form hidden name="leads" method="POST" data-netlify="true">
+<!-- Form necessário para Netlify detectar -->
+<form name="leads" method="POST" data-netlify="true" hidden>
   <input type="hidden" name="form-name" value="leads">
   <input type="text" name="nome">
   <input type="email" name="email">
@@ -28,36 +31,61 @@
 </form>
 
 <script>
+// 🔹 Decodifica o JWT do Google
 function parseJwt(token) {
-  const base64Url = token.split('.')[1];
-  const base64 = atob(base64Url);
-  return JSON.parse(base64);
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = atob(base64Url.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(base64);
+  } catch (e) {
+    console.error("Erro ao decodificar token:", e);
+    return null;
+  }
 }
 
-function handleCredentialResponse(response) {
+// 🔹 Função chamada após login Google
+async function handleCredentialResponse(response) {
+  console.log("Login recebido");
+
   const data = parseJwt(response.credential);
 
-  // Envia para Netlify Forms
+  if (!data) {
+    alert("Erro ao processar login");
+    return;
+  }
+
+  console.log("Dados:", data);
+
+  // 🔹 Monta form para Netlify
   const formData = new FormData();
   formData.append("form-name", "leads");
   formData.append("nome", data.name);
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
-  fetch("/", {
-    method: "POST",
-    body: formData
-  });
+  try {
+    // 🔥 Espera o POST finalizar
+    await fetch("/", {
+      method: "POST",
+      body: formData
+    });
 
-  // Redireciona com dados
-  const nome = encodeURIComponent(data.name);
-  const email = encodeURIComponent(data.email);
-  const foto = encodeURIComponent(data.picture);
+    console.log("Lead enviado com sucesso");
 
+  } catch (error) {
+    console.error("Erro ao enviar lead:", error);
+  }
+
+  // 🔹 Prepara dados para URL
+  const nome = encodeURIComponent(data.name || "");
+  const email = encodeURIComponent(data.email || "");
+  const foto = encodeURIComponent(data.picture || "");
+
+  // 🔥 Redireciona depois de tudo pronto
   window.location.href = `https://obracorretora.com.br?nome=${nome}&email=${email}&foto=${foto}`;
 }
 
-// ⚠️ window.onload FORA da função (esse era o erro principal)
+// 🔹 Inicializa botão Google
 window.onload = function () {
   google.accounts.id.initialize({
     client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
