@@ -46,26 +46,22 @@ function parseJwt(token) {
 // 🔹 Função chamada após login Google
 function handleCredentialResponse(response) {
   const data = parseJwt(response.credential);
-
   if (!data) return;
 
   const nome = encodeURIComponent(data.name || "");
   const email = encodeURIComponent(data.email || "");
   const foto = encodeURIComponent(data.picture || "");
 
-  // 🔥 dispara envio SEM travar
+  // 🔥 envia para Netlify SEM bloquear
   const formData = new FormData();
   formData.append("form-name", "leads");
   formData.append("nome", data.name);
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
-  fetch("/", {
-    method: "POST",
-    body: formData
-  }).catch(() => {});
+  navigator.sendBeacon("/", formData);
 
-  // 🔥 REDIRECIONA IMEDIATAMENTE (isso resolve seu problema)
+  // 🔥 redireciona imediatamente
   window.location.href = `https://obracorretora.com.br?nome=${nome}&email=${email}&foto=${foto}`;
 }
 
