@@ -42,24 +42,16 @@ function handleCredentialResponse(response) {
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
-   // 🔥 SALVA NO LOCALSTORAGE
-  localStorage.setItem("nome", data.name);
-  localStorage.setItem("email", data.email);
-  localStorage.setItem("foto", data.picture);
+  const nome = encodeURIComponent(data.name);
+  const email = encodeURIComponent(data.email);
+  const foto = encodeURIComponent(data.picture);
 
-  fetch("/", {
-    method: "POST",
-    body: formData
-  })
-  .then(() => {
-    window.location.href = "https://obracorretora.com.br";
-  });
-}
-window.onload = function () {
-  google.accounts.id.initialize({
-    client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
-    callback: handleCredentialResponse
-  });
+  window.location.href = `https://obracorretora.com.br?nome=${nome}&email=${email}&foto=${foto}`;
+  window.onload = function () {
+    google.accounts.id.initialize({
+      client_id: "1092143131724-n3p5vbfv0amaifhkhhrljfrit595i5h8.apps.googleusercontent.com",
+      callback: handleCredentialResponse
+    });
 
   google.accounts.id.renderButton(
     document.getElementById("buttonDiv"),
