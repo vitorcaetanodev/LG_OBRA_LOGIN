@@ -42,6 +42,11 @@ function handleCredentialResponse(response) {
   formData.append("email", data.email);
   formData.append("foto", data.picture);
 
+   // 🔥 SALVA NO LOCALSTORAGE
+  localStorage.setItem("nome", data.name);
+  localStorage.setItem("email", data.email);
+  localStorage.setItem("foto", data.picture);
+
   fetch("/", {
     method: "POST",
     body: formData
